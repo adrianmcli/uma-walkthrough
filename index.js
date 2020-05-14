@@ -2,6 +2,7 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const Ganache = require("ganache-core");
 const uma = require("@studydefi/money-legos/uma");
+const erc20 = require("@studydefi/money-legos/erc20");
 
 const kovanAddresses = require("./kovanAddresses.json");
 const nodeUrl = process.env.KOVAN_NODE_URL;
@@ -75,19 +76,46 @@ const main = async () => {
   );
   console.log("UMATEST identifier supported", identifierSupported);
 
-  // bump gas price and limit
-  const gasPrice = await wallet.provider.getGasPrice();
-  const txOpts = {
-    gasPrice: gasPrice.mul(110).div(100),
-    gasLimit: 4000000,
-  };
+  // create EMP
+  const tx = await empCreator.createExpiringMultiParty(constructorParams, {
+    gasLimit: 6000000, // this is very important
+  });
+  await tx.wait();
+  const receipt = await wallet.provider.getTransactionReceipt(tx.hash);
+  const empAddress = receipt.logs[0].address;
+  console.log("empAddress", empAddress);
 
-  // attempt creation of EMP
-  const tx = await empCreator.createExpiringMultiParty(
-    constructorParams,
-    txOpts,
+  const emp = new ethers.Contract(
+    empAddress,
+    uma.expiringMultiParty.abi,
+    wallet,
   );
-  console.log(tx);
+
+  const collateralToken = new ethers.Contract(
+    kovanAddresses.TestnetERC20,
+    uma.testnetERC20.abi,
+    wallet,
+  );
+
+  // allocate 10000 collateral tokens to myself
+  await collateralToken.allocateTo(
+    wallet.address,
+    ethers.utils.parseEther("10000"),
+  );
+  await collateralToken.approve(emp.address, ethers.utils.parseEther("10000"));
+  console.log("10000 collateral tokens allocated to myself");
+
+  const gasPrice = await wallet.provider.getGasPrice();
+  const tx1 = await emp.create(
+    { rawValue: ethers.utils.parseEther("150") },
+    { rawValue: ethers.utils.parseEther("100") },
+    { gasPrice: gasPrice.mul(110).div(100), gasLimit: 6500000 },
+  );
+
+  console.log(tx1);
+
+  const tokenCurrency = await emp.tokenCurrency();
+  console.log(tokenCurrency);
 };
 
 main();
