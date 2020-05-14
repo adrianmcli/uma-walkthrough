@@ -13,6 +13,7 @@ const main = async () => {
   const ganache = Ganache.provider({
     fork: nodeUrl,
     network_id: 42,
+    gasLimit: 20000000,
     accounts: [
       {
         secretKey: privKey,
@@ -107,9 +108,9 @@ const main = async () => {
 
   const gasPrice = await wallet.provider.getGasPrice();
   const tx1 = await emp.create(
-    { rawValue: ethers.utils.parseEther("150") },
-    { rawValue: ethers.utils.parseEther("100") },
-    { gasPrice: gasPrice.mul(110).div(100), gasLimit: 6500000 },
+    [ethers.utils.parseEther("150")],
+    [ethers.utils.parseEther("100")],
+    { gasLimit: 20000000 },
   );
 
   console.log(tx1);
