@@ -25,15 +25,15 @@ const main = async () => {
     wallet,
   );
 
-  // check if TestnetERC20 and WETH9 are supported as collateral
+  // check if TestnetERC20 is supported as collateral
   const TestnetERC20Supported = await collateralTokenWhitelist.isOnWhitelist(
     kovanAddresses.TestnetERC20,
   );
-  const WETH9Supported = await collateralTokenWhitelist.isOnWhitelist(
-    kovanAddresses.WETH9,
-  );
+  // const WETH9Supported = await collateralTokenWhitelist.isOnWhitelist(
+  //   kovanAddresses.WETH9,
+  // );
   console.log("TestnetERC20 collateral supported", TestnetERC20Supported);
-  console.log("WETH9 collateral supported", WETH9Supported);
+  // console.log("WETH9 collateral supported", WETH9Supported);
 
   // EMP / token factory parameters
   const constructorParams = {
