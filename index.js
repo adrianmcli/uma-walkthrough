@@ -1,29 +1,13 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
-const Ganache = require("ganache-core");
 const uma = require("@studydefi/money-legos/uma");
-const erc20 = require("@studydefi/money-legos/erc20");
 
 const kovanAddresses = require("./kovanAddresses.json");
-const nodeUrl = process.env.KOVAN_NODE_URL;
 const privKey = process.env.PRIV_KEY;
 
 const main = async () => {
-  // fork from kovan
-  const ganache = Ganache.provider({
-    fork: nodeUrl,
-    network_id: 42,
-    gasLimit: 20000000,
-    accounts: [
-      {
-        secretKey: privKey,
-        balance: ethers.utils.hexlify(ethers.utils.parseEther("1000")),
-      },
-    ],
-  });
-
   // setup Ethers.js wallet
-  const provider = new ethers.providers.Web3Provider(ganache);
+  const provider = new ethers.providers.JsonRpcProvider();
   const wallet = new ethers.Wallet(privKey, provider);
 
   // instantiate empCreator
@@ -106,17 +90,11 @@ const main = async () => {
   await collateralToken.approve(emp.address, ethers.utils.parseEther("10000"));
   console.log("10000 collateral tokens allocated to myself");
 
-  const gasPrice = await wallet.provider.getGasPrice();
-  const tx1 = await emp.create(
+  await emp.create(
     [ethers.utils.parseEther("150")],
-    [ethers.utils.parseEther("100")],
+    [ethers.utils.parseEther("10")],
     { gasLimit: 20000000 },
   );
-
-  console.log(tx1);
-
-  const tokenCurrency = await emp.tokenCurrency();
-  console.log(tokenCurrency);
 };
 
 main();

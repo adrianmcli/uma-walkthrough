@@ -22,7 +22,8 @@ Goals:
     ```
 
     Feel free to ask me for the above.
-3. `npm start`
+3. `npm run start-chain` starts a Ganache test-chain forked off Kovan
+4. `npm run start` starts the script
 
 ## Note
 
