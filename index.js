@@ -91,8 +91,8 @@ const main = async () => {
   console.log("10000 collateral tokens allocated to myself");
 
   await emp.create(
-    [ethers.utils.parseEther("150")],
-    [ethers.utils.parseEther("10")],
+    { rawValue: ethers.utils.parseEther("150") },
+    { rawValue: ethers.utils.parseEther("10") },
     { gasLimit: 20000000 },
   );
 };
